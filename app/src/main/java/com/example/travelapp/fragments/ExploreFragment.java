@@ -39,7 +39,7 @@ public class ExploreFragment extends Fragment {
 
         // Load danh sách từ JSON
         destinationList = DataLoader.loadDestinations(getContext());
-        adapter = new DestinationAdapter(destinationList);
+        adapter = new DestinationAdapter(getContext(),destinationList);
         recyclerView.setAdapter(adapter);
 
         // Tìm kiếm

@@ -29,23 +29,18 @@ public class MainActivity extends AppCompatActivity {
         // Bắt sự kiện click
         bottomNavigationView.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = null;
+            int id = item.getItemId();
 
-            switch (item.getItemId()) {
-                case R.id.nav_home:
-                    selectedFragment = new HomeFragment();
-                    break;
-                case R.id.nav_explore:
-                    selectedFragment = new ExploreFragment();
-                    break;
-                case R.id.nav_favorites:
-                    selectedFragment = new FavoritesFragment();
-                    break;
-                case R.id.nav_profile:
-                    selectedFragment = new ProfileFragment();
-                    break;
+            if (id == R.id.nav_home) {
+                selectedFragment = new HomeFragment();
+            } else if (id == R.id.nav_explore) {
+                selectedFragment = new ExploreFragment();
+            } else if (id == R.id.nav_favorites) {
+                selectedFragment = new FavoritesFragment();
+            } else if (id == R.id.nav_profile) {
+                selectedFragment = new ProfileFragment();
             }
 
-            // Hiển thị fragment tương ứng
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.frame_container, selectedFragment)
                     .commit();
