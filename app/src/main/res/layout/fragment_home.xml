@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#FFFFFF">
+
+    <TextView
+        android:text="🏠 Trang chủ"
+        android:textSize="26sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"/>
+
+    <TextView
+        android:text="Khám phá các điểm đến nổi bật tại Việt Nam!"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp"
+        android:textColor="#777777"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"/>
+</LinearLayout>
