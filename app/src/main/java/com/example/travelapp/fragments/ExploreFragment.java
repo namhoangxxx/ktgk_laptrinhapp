@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,7 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.travelapp.R;
 import com.example.travelapp.adapters.DestinationAdapter;
 import com.example.travelapp.models.Destination;
-import com.example.travelapp.utils.DataLoader;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,21 +30,35 @@ public class ExploreFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_explore, container, false);
 
+        View view = inflater.inflate(R.layout.fragment_explore, container, false);
         recyclerView = view.findViewById(R.id.recyclerViewExplore);
         SearchView searchView = view.findViewById(R.id.searchView);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        // Load danh sách từ JSON
-        destinationList = DataLoader.loadDestinations(getContext());
-        adapter = new DestinationAdapter(getContext(),destinationList);
+        destinationList = new ArrayList<>();
+        adapter = new DestinationAdapter(getContext(), destinationList);
         recyclerView.setAdapter(adapter);
 
-        // Tìm kiếm
+        // 🔹 Load Firestore
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("tours")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    destinationList.clear();
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                        Destination dest = doc.toObject(Destination.class);
+                        destinationList.add(dest);
+                    }
+                    adapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(getContext(), "Lỗi tải dữ liệu: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+
+        // 🔹 Search
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -61,13 +77,13 @@ public class ExploreFragment extends Fragment {
     }
 
     private void filterList(String text) {
-        List<Destination> filteredList = new ArrayList<>();
-        for (Destination dest : destinationList) {
-            if (dest.getName().toLowerCase().contains(text.toLowerCase()) ||
-                    dest.getLocation().toLowerCase().contains(text.toLowerCase())) {
-                filteredList.add(dest);
+        List<Destination> filtered = new ArrayList<>();
+        for (Destination d : destinationList) {
+            if (d.getName().toLowerCase().contains(text.toLowerCase()) ||
+                    d.getLocation().toLowerCase().contains(text.toLowerCase())) {
+                filtered.add(d);
             }
         }
-        adapter.updateList(filteredList);
+        adapter.updateList(filtered);
     }
 }
