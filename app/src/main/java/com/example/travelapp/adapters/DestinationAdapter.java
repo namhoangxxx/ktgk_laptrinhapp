@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.travelapp.R;
 import com.example.travelapp.models.Destination;
 
@@ -24,6 +25,7 @@ public class DestinationAdapter extends RecyclerView.Adapter<DestinationAdapter.
     private OnItemClickListener listener;
     private SharedPreferences prefs;
     private Set<String> favoriteSet;
+    private Context context;
 
     // Interface listener để truyền sự kiện click ra Fragment/Activity
     public interface OnItemClickListener {
@@ -32,6 +34,7 @@ public class DestinationAdapter extends RecyclerView.Adapter<DestinationAdapter.
 
     // Constructor
     public DestinationAdapter(Context context, List<Destination> destinationList) {
+        this.context = context;
         this.destinationList = destinationList;
         prefs = context.getSharedPreferences("favorites", Context.MODE_PRIVATE);
         favoriteSet = new HashSet<>(prefs.getStringSet("favorite_names", new HashSet<>()));
@@ -58,13 +61,21 @@ public class DestinationAdapter extends RecyclerView.Adapter<DestinationAdapter.
     @Override
     public void onBindViewHolder(@NonNull DestinationAdapter.ViewHolder holder, int position) {
         Destination destination = destinationList.get(position);
+
         holder.tvName.setText(destination.getName());
         holder.tvLocation.setText(destination.getLocation());
 
-        if (destination.getImageResId() != 0) {
+        // 🔹 Load ảnh — Ưu tiên URL từ Firebase, nếu không thì ảnh drawable
+        if (destination.getImageUrl() != null && !destination.getImageUrl().isEmpty()) {
+            Glide.with(context)
+                    .load(destination.getImageUrl())
+                    .placeholder(R.drawable.dalat) // ảnh mặc định khi đang tải
+                    .error(R.drawable.dalat)       // ảnh fallback khi lỗi
+                    .into(holder.imgDestination);
+        } else if (destination.getImageResId() != 0) {
             holder.imgDestination.setImageResource(destination.getImageResId());
         } else {
-            holder.imgDestination.setImageResource(R.drawable.ic_launcher_foreground);
+            holder.imgDestination.setImageResource(R.drawable.dalat);
         }
 
         // ✅ Cập nhật trạng thái icon yêu thích
@@ -87,7 +98,7 @@ public class DestinationAdapter extends RecyclerView.Adapter<DestinationAdapter.
             } else {
                 favoriteSet.add(destination.getName());
                 holder.imgFavorite.setImageResource(R.drawable.ic_favorite_filled);
-                showHeartAnimation(holder.imgFavorite); // 💗 thêm hiệu ứng bay lên
+                showHeartAnimation(holder.imgFavorite);
             }
 
             // Lưu lại vào SharedPreferences
@@ -119,17 +130,14 @@ public class DestinationAdapter extends RecyclerView.Adapter<DestinationAdapter.
         heart.setImageResource(R.drawable.ic_favorite_filled);
         heart.setLayoutParams(new ViewGroup.LayoutParams(80, 80));
 
-        // Lấy root view (decor view)
         ViewGroup rootView = (ViewGroup) ((ViewGroup) view.getRootView()).getChildAt(0);
         rootView.addView(heart);
 
-        // Lấy vị trí ban đầu
         int[] location = new int[2];
         view.getLocationOnScreen(location);
         heart.setX(location[0]);
         heart.setY(location[1] - 50);
 
-        // Tạo animation bay lên + mờ dần
         heart.animate()
                 .translationYBy(-250f)
                 .alpha(0f)

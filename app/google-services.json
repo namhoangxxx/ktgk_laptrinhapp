@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "451313908573",
+    "project_id": "appdulich-e282e",
+    "storage_bucket": "appdulich-e282e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:451313908573:android:0e699a3613ed09fb39c6b4",
+        "android_client_info": {
+          "package_name": "com.example.travelapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaIpG0FN1aiqznoCCEEPVe5WAbv7v-e9o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
