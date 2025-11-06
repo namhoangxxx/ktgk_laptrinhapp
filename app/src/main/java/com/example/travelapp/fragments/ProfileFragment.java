@@ -1,5 +1,7 @@
 package com.example.travelapp.fragments;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +14,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.travelapp.LoginActivity;
+import com.example.travelapp.PersonalInfoActivity;
 import com.example.travelapp.R;
+import com.example.travelapp.SettingsActivity;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class ProfileFragment extends Fragment {
 
@@ -26,6 +33,7 @@ public class ProfileFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
+        // Ánh xạ
         tvName = view.findViewById(R.id.tvName);
         tvEmail = view.findViewById(R.id.tvEmail);
         tvFavoritesCount = view.findViewById(R.id.tvFavoritesCount);
@@ -33,9 +41,16 @@ public class ProfileFragment extends Fragment {
         tvPoints = view.findViewById(R.id.tvPoints);
         btnEditAvatar = view.findViewById(R.id.btnEditAvatar);
 
-        // Dữ liệu demo
-        tvName.setText("Nguyễn Văn A");
-        tvEmail.setText("email@gmail.com");
+        // Lấy thông tin người dùng từ SharedPreferences
+        SharedPreferences prefs = getContext().getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        String fullName = prefs.getString("fullname", "Người dùng");
+        String email = prefs.getString("email", "email@gmail.com");
+
+        // Gán lên giao diện
+        tvName.setText(fullName);
+        tvEmail.setText(email);
+
+        // Các thông tin demo
         tvFavoritesCount.setText("12");
         tvToursCount.setText("5");
         tvPoints.setText("120");
@@ -44,15 +59,31 @@ public class ProfileFragment extends Fragment {
         btnEditAvatar.setOnClickListener(v ->
                 Toast.makeText(getContext(), "Chức năng chỉnh sửa avatar", Toast.LENGTH_SHORT).show());
 
-        // Click menu cá nhân
+        // Click "Thông tin cá nhân"
         view.findViewById(R.id.llProfileInfo).setOnClickListener(v ->
-                Toast.makeText(getContext(), "Thông tin cá nhân", Toast.LENGTH_SHORT).show());
+                startActivity(new Intent(getContext(), PersonalInfoActivity.class)));
 
+        // Click "Cài đặt"
         view.findViewById(R.id.llSettings).setOnClickListener(v ->
-                Toast.makeText(getContext(), "Cài đặt", Toast.LENGTH_SHORT).show());
+                startActivity(new Intent(getContext(), SettingsActivity.class)));
 
-        view.findViewById(R.id.llLogout).setOnClickListener(v ->
-                Toast.makeText(getContext(), "Đăng xuất", Toast.LENGTH_SHORT).show());
+        // ✅ Click "Đăng xuất" — thêm phần này
+        view.findViewById(R.id.llLogout).setOnClickListener(v -> {
+            // Xóa trạng thái đăng nhập
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean("isLoggedIn", false);
+            editor.apply();
+
+            // Thông báo
+            Toast.makeText(getContext(), "Đăng xuất thành công", Toast.LENGTH_SHORT).show();
+
+            // Chuyển về màn hình đăng nhập
+            Intent intent = new Intent(getContext(), LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+
+            requireActivity().finish(); // đóng MainActivity
+        });
 
         return view;
     }
