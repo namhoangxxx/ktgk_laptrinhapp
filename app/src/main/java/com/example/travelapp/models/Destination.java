@@ -1,6 +1,8 @@
 package com.example.travelapp.models;
 
-public class Destination {
+import java.io.Serializable;
+
+public class Destination implements Serializable {
     private String name;
     private String location;
     private int imageResId;       // Ảnh tĩnh trong drawable

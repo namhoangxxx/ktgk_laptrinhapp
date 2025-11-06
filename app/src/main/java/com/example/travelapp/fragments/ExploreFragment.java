@@ -1,5 +1,6 @@
 package com.example.travelapp.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +43,13 @@ public class ExploreFragment extends Fragment {
         destinationList = new ArrayList<>();
         adapter = new DestinationAdapter(getContext(), destinationList);
         recyclerView.setAdapter(adapter);
+
+        // Sửa listener để gửi cả đối tượng Destination
+        adapter.setOnItemClickListener(destination -> {
+            Intent intent = new Intent(getContext(), TourDetailActivity.class);
+            intent.putExtra(TourDetailActivity.EXTRA_TOUR, destination);
+            startActivity(intent);
+        });
 
         // 🔹 Load Firestore
         FirebaseFirestore db = FirebaseFirestore.getInstance();
